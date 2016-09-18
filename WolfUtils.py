@@ -1,4 +1,4 @@
-import chatexchange6
+from ChatExchange6 import chatexchange6 as chatexchange6
 import json
 import shlex
 import sys

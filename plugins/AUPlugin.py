@@ -58,6 +58,7 @@ def remfilter(message, args):
         message.message.reply("One argument (word) needed!")
         return None    
     elif len(args) == 1:
+        word = args[0]
         if word in WORD_LIST:
             WORD_LIST.remove(word)
             PREFS.set("word_filter_list", WORD_LIST)
