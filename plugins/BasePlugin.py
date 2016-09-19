@@ -21,7 +21,7 @@ def addadmin(message, args):
     if args[0] not in currentAdmins:
         currentAdmins.append(args[0])
         PREFS.set("admins", currentAdmins)
-        message.message.reply("User ID " + args[0] + " added as bot admin.")
+        message.message.reply(WolfUtils.getName(args[0]) + " (ID  "+ args[0] + ") added as bot admin.")
         return None
     else:
         message.message.reply("User is already a declared admin!")
@@ -37,7 +37,7 @@ def addadmin(message, args):
     if args[0] in currentAdmins:
         currentAdmins.remove(args[0])
         PREFS.set("admins", currentAdmins)
-        message.message.reply("User ID " + args[0] + " removed from bot admin.")
+        message.message.reply(WolfUtils.getName(args[0]) + " removed from bot admin.")
         return None
     else:
         message.message.reply("User is not a declared admin! (This command may not be used to remove inherited rights)")
@@ -106,3 +106,36 @@ def takeRoot(message, args):
             message.message.reply("You are by far the worst captain I've ever heard of.")
     else:
         message.message.reply("You are by far the worst captain I've ever heard of.")
+        
+@registerCommand("blacklist", "Block a user from using commands", "", {"adminNeeded": True})
+def blacklistUser(message, args):
+    if len(args) != 1:
+        message.message.reply("Needs one argument (user_id)")
+        
+    user_to_bl = args[0]
+    
+    current_blacklist = PREFS.get("blacklist", [])
+    if user_to_bl not in current_blacklist:
+        if not WolfUtils.isAdmin(user_to_bl):
+            current_blacklist.append(user_to_bl)
+            PREFS.set("blacklist", current_blacklist)
+            message.message.reply(WolfUtils.getName(user_to_bl) + " (ID  "+ user_to_bl + ") is no longer permitted to use WolfBot commands.")
+        else:
+            message.message.reply("Admins and Superusers may not be blacklisted.")
+    else:
+        message.message.reply("User is already blacklisted!")
+        
+@registerCommand("unblacklist", "Allow a user to use commands", "", {"adminNeeded": True})
+def unblacklistUser(message, args):
+    if len(args) != 1:
+        message.message.reply("Needs one argument (user_id)")
+        
+    user_to_unbl = args[0]
+    
+    current_blacklist = PREFS.get("blacklist", [])
+    if user_to_unbl in current_blacklist:
+        current_blacklist.remove(user_to_unbl)
+        PREFS.set("blacklist", current_blacklist)
+        message.message.reply(WolfUtils.getName(user_to_unbl) + " (ID  "+ user_to_unbl + ") is now permitted to use WolfBot commands.")
+    else:
+        message.message.reply("User is already blacklisted!")

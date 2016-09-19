@@ -17,7 +17,7 @@ def whoami(message, args):
     isAdm = WolfUtils.isAdmin(uid)
     isRO  = WolfUtils.isRoomOwner(uid)
     
-    message.message.reply("You are: " + username + " (ID: " + str(uid) + ")" + \
+    message.message.reply("You are: " + username + " (ID " + str(uid) + ")" + \
     "\nIs Bot Superuser (Grants Bot Admin): " + str(isDev) + \
     "\nIs Bot Admin: " + str(isAdm) + \
     "\nIs SE Mod (Grants Superuser): " + str(isMod) + \

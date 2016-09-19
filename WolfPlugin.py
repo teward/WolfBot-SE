@@ -20,13 +20,15 @@ class CommandManager:
 
     def execute(self, message, commandName, args):
 
-        try:
-            command = self._commands[commandName]
-        except KeyError:
-            message.message.reply("The command " + WolfUtils.CMD_DELIM + commandName + " does not exist.")
+        # Make sure the user isn't blacklisted from executing commands  
+        if str(message.data['user_id']) in PREFS.get("blacklist", {}):
             return None
             
-        if message.data['user_id'] in PREFS.get("banList", {}):
+        # Verify that the command exists.
+        try:
+            command= self._commands[commandName.lower()]
+        except KeyError:
+            message.message.reply("The command " + WolfUtils.CMD_DELIM + commandName + " does not exist.")
             return None
 
         # Make sure the user is a superuser for superuser commands

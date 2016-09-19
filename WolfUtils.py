@@ -33,6 +33,9 @@ def webPost(address, data):
     json = requests.post(address,data).json()
     return json
     
+def getName(user_id):
+    return webPost("https://chat.stackexchange.com/user/info", {"ids": user_id, "roomId": ROOM_ID})["users"][0]["name"]
+    
 def isRoomOwner(user_id):
     n = webPost("https://chat.stackexchange.com/user/info", {"ids": user_id, "roomId": ROOM_ID})["users"][0]["is_owner"]
     
