@@ -1,13 +1,12 @@
 import os
 import sys
 import signal
-
 import WolfUtils
-from WolfPlugin import registerCommand, registerTask
 
+import ChatExchange6.chatexchange6 as chatexchange6
+
+from WolfPlugin import registerCommand, registerTask, registerListener
 from WolfPrefs import PREFS
-
-from plugins import __init__ as PluginInit
 
 
 # Privilege Escalation
@@ -56,6 +55,21 @@ def setprefix(message, args):
     else:
         PREFS.set("command_delimiter", args[0])
         WolfUtils.CMD_DELIM = args[0]
+        message.message.reply("Prefix set to `" + args[0] + "`.")
+        
+@registerCommand("setrprefix", "Change the bot reply prefix", "", {"superuserNeeded": True})
+def setprefix(message, args):
+    if len(args) > 1:
+        message.message.reply("One argument (prefix) needed!")
+        return None
+
+    if len(args) == 0:
+        PREFS.set("reply_delimiter", "%")
+        WolfUtils.REPLY_DELIM = "%"
+        message.message.reply("Prefix reset to default of `%`.")
+    else:
+        PREFS.set("reply_delimiter", args[0])
+        WolfUtils.REPLY_DELIM = args[0]
         message.message.reply("Prefix set to `" + args[0] + "`.")
         
 @registerCommand("reload", "Reload the bot", "<prefs|commands|all>", {"superuserNeeded": True})
@@ -139,3 +153,9 @@ def unblacklistUser(message, args):
         message.message.reply(WolfUtils.getName(user_to_unbl) + " (ID  "+ user_to_unbl + ") is now permitted to use WolfBot commands.")
     else:
         message.message.reply("User is already blacklisted!")
+        
+@registerListener("modtool-deletemsg", 18)
+def listenerDeleteMessage(message):
+    if message.data["content"] == "@WolfBot %d":
+        if WolfUtils.isAdmin(message.data["user_id"]):
+            chatexchange6.messages.Message(message.data["parent_id"], message.client).delete()

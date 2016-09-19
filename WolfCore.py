@@ -9,17 +9,19 @@ import WolfUtils
 from WolfPrefs import PREFS
 from WolfPlugin import COMMANDS
 from WolfPlugin import TASKS
+from WolfPlugin import LISTENERS
 
 from plugins import *
 
 def on_message(message, client):
+
+    LISTENERS.execListeners(message)
+
     if not isinstance(message, chatexchange6.events.MessagePosted):
         return
 
     content = HTMLParser.HTMLParser().unescape(message.content)
     user = message.user
-    
-    #print("Got message:\n" + str(message.data))
 
     if WolfUtils.isCommand(content):
         cmd = WolfUtils.parseCommand(content)[0]

@@ -60,10 +60,8 @@ class Prefs:
             self._prefs = {}
             self.set("command_delimiter", "!!/")
             print("[Prefs] Set Command String to !!/")
-            self.set("chat_id", 45540)
-            print("[Prefs] Set Operating ID to 45540 (Test Chat)")
-            self.set("devs", [97389])
-            print("[Prefs] Set user Kaz Wolfe (97389) to Dev power.")
+            self.set("reply_delimiter", "%")
+            print("[Prefs] Set Reply String to %")
             self.save()
             print("[Prefs] Default preferences saved.")
 

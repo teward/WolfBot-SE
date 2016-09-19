@@ -67,9 +67,27 @@ class ScheduledTaskManager:
                 taskEntry["lastRun"] = calendar.timegm(time.gmtime())
                 print("Finished task " + task)
                 
+class ListenerManager:
+    def __init__(self):
+        self._listeners = {}
+    
+    def register(self, function, name, eventId):
+        self._listeners[name] = {"function": function, "eventId": eventId}
+        
+    def deregister(self, name):
+        del self._listeners[name]
+        
+    def execListeners(self, message):
+        eventId = int(message.data['event_type'])
+        for listenerName in self._listeners:
+            listener = self._listeners[listenerName]
+            if listener["eventId"] == eventId:
+                listener["function"](message)
+                
         
 COMMANDS = CommandManager()
 TASKS = ScheduledTaskManager()
+LISTENERS = ListenerManager()
 
 def registerCommand(name, helptext, helpargs, permset):
     def wrap(fn):
@@ -87,4 +105,13 @@ def registerTask(name, runDelay):
         # fn.__name__ is the name of the function
         TASKS.register(fn, name, runDelay)
         print "Registered scheduled task " + name + ", to be run every " + str(runDelay) + " seconds."
+    return wrap
+    
+def registerListener(name, eventId):
+    def wrap(fn):
+        # perform registration here
+        # fn points to the function itself
+        # fn.__name__ is the name of the function
+        LISTENERS.register(fn, name, eventId)
+        print "Registered listener " + name
     return wrap

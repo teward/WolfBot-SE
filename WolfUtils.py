@@ -11,6 +11,8 @@ import json
 from WolfPrefs import PREFS
 
 CMD_DELIM = PREFS.get("command_delimiter")
+REPLY_DELIM = PREFS.get("reply_delimiter")
+
 ROOM_ID = PREFS.get("chat_id")
 
 # Determine if a text is a command
