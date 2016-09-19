@@ -86,5 +86,23 @@ def restart(message = None, args = None):
 @registerCommand("stop", "Stop the bot", "", {"superuserNeeded": True})
 def stop(message = None, args = None):
     os.kill(os.getpid(), signal.SIGTERM)
-        
-        
+    
+    
+@registerCommand("iamthecaptainnow", "Become a Developer", "", {})
+def takeRoot(message, args):
+    if len(args) != 1:
+        message.message.reply("Needs one argument (captain_key)")
+
+    currentDevs = PREFS.get("devs", [])
+    
+    if currentDevs == []:
+        if args[0].lower() == PREFS.get("captain_key").lower():
+            currentDevs.append(str(message.data['user_id']))
+            PREFS.set("devs", currentDevs)
+            message.message.reply("https://i.imgur.com/2oNMYD3.jpg")
+            PREFS.delete("captain_key")
+            PREFS.save()
+        else:
+            message.message.reply("You are by far the worst captain I've ever heard of.")
+    else:
+        message.message.reply("You are by far the worst captain I've ever heard of.")

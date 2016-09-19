@@ -2,6 +2,7 @@ import ChatExchange6.chatexchange6 as chatexchange6
 import time
 import HTMLParser
 import getpass
+import random
 
 import WolfUtils
 
@@ -48,6 +49,12 @@ if __CHATID__ is None:
     __CHATID__ = input("Please enter the Chat to join: ")
     PREFS.set("chat_id", __CHATID__)
     PREFS.save()
+    
+if PREFS.get("devs", []) == []:
+    ckey = "%06x" % random.randint(0, 0xFFFFFF)
+    PREFS.set("captain_key", ckey)
+    print("Please run this command to gain superuser privileges (single-use!):\n\n /iamthecaptainnow " + ckey.upper() + "\n\n")
+    
 
 # Register the Client to be used
 client = chatexchange6.Client('stackexchange.com')
