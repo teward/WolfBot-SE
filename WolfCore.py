@@ -7,6 +7,7 @@ import random
 import WolfUtils
 
 from WolfPrefs import PREFS
+from WolfPrefs import SESSION_STORAGE
 from WolfPlugin import COMMANDS
 from WolfPlugin import TASKS
 from WolfPlugin import LISTENERS
@@ -29,6 +30,8 @@ def on_message(message, client):
         print("Got command " + cmd + " with args " + " ".join(args))
         COMMANDS.execute(message, cmd, args)
         #message.message.reply("User " + user.name + " sent command " + command + " with args " + " ".join(args))
+
+print("WolfBot loading... please wait.")
 
 try:
     input = raw_input
@@ -65,11 +68,14 @@ client.login(__USER__, __PASS__)
 # Get the Bot itself
 me = client.get_me()
 
+SESSION_STORAGE.set("bot_username", me.name.replace(" ", ""))
+SESSION_STORAGE.set("bot_id", client._br.user_id)
+
 # Bind the user to the chat room
 room = client.get_room(__CHATID__)
 room.join()
 room.watch(on_message)
-print("Ready for commands")
+print("WolfBot online.")
 
 while True:
     time.sleep(1)

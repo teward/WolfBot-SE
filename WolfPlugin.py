@@ -62,10 +62,10 @@ class ScheduledTaskManager:
         for task in self._tasks:
             taskEntry = self._tasks[task]
             if (int(time.time()) - taskEntry["lastRun"]) >= taskEntry["runDelay"]:
-                print("Running task " + task)
+                #print("Running task " + task)
                 taskEntry["function"](room)
                 taskEntry["lastRun"] = calendar.timegm(time.gmtime())
-                print("Finished task " + task)
+                #print("Finished task " + task)
                 
 class ListenerManager:
     def __init__(self):
@@ -95,7 +95,7 @@ def registerCommand(name, helptext, helpargs, permset):
         # fn points to the function itself
         # fn.__name__ is the name of the function
         COMMANDS.register(fn, name, helptext, helpargs, permset)
-        print "Registered command " + WolfUtils.CMD_DELIM + name
+        #print "Registered command " + WolfUtils.CMD_DELIM + name
     return wrap
     
 def registerTask(name, runDelay):
@@ -104,7 +104,7 @@ def registerTask(name, runDelay):
         # fn points to the function itself
         # fn.__name__ is the name of the function
         TASKS.register(fn, name, runDelay)
-        print "Registered scheduled task " + name + ", to be run every " + str(runDelay) + " seconds."
+        #print "Registered scheduled task " + name + ", to be run every " + str(runDelay) + " seconds."
     return wrap
     
 def registerListener(name, eventId):
@@ -113,5 +113,5 @@ def registerListener(name, eventId):
         # fn points to the function itself
         # fn.__name__ is the name of the function
         LISTENERS.register(fn, name, eventId)
-        print "Registered listener " + name
+        #print "Registered listener " + name
     return wrap

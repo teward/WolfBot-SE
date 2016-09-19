@@ -74,7 +74,53 @@ class Prefs:
 
     def all(self):
         return self._prefs
+        
+class SessionStorage:
+    """
+    Object used for storing preferences.
+    """
+
+    def __init__(self):
+        self._prefs = {}
+
+    def __len__(self):
+        return len(self._prefs)
+
+    def __getitem__(self, chat):
+        return self._prefs.get(str(chat), {})
+
+    def get(self, key, default = None):
+        """
+        Retrieve the value for the provided key in chat. Return None if the
+        key or chat does not exist.
+        """
+        try:
+            return self._prefs[key]
+        except KeyError:
+            return default
+
+    def exists(self, key):
+        if (self.get(key) is None):
+            return False
+
+        return True
+
+    def set(self, key, value):
+        """
+        Set the value for the provided key in chat, creating objects as needed.
+        """
+        c = self._prefs
+        c[key] = value
+        self._prefs = c
+        
+    def delete(self, key):
+        c = self._prefs
+        c.pop(key, None)
+        
+    def all(self):
+        return self._prefs
 
 
+SESSION_STORAGE = SessionStorage()
 PREFS = Prefs()
 PREFS.load()

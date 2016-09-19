@@ -7,7 +7,7 @@ import ChatExchange6.chatexchange6 as chatexchange6
 
 from WolfPlugin import registerCommand, registerTask, registerListener
 from WolfPrefs import PREFS
-
+from WolfPrefs import SESSION_STORAGE
 
 # Privilege Escalation
 @registerCommand("addadmin", "Add an Admin to the system.", "", {"superuserNeeded": True})
@@ -156,6 +156,6 @@ def unblacklistUser(message, args):
         
 @registerListener("modtool-deletemsg", 18)
 def listenerDeleteMessage(message):
-    if message.data["content"] == "@WolfBot %d":
+    if message.data["content"] == "@" + SESSION_STORAGE.get("bot_username") + " " + WolfUtils.REPLY_DELIM + "d":
         if WolfUtils.isAdmin(message.data["user_id"]):
             chatexchange6.messages.Message(message.data["parent_id"], message.client).delete()
