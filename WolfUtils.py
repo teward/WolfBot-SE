@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from ChatExchange6 import chatexchange6 as chatexchange6
 import json
 import shlex

@@ -35,3 +35,12 @@ def adminTest(message, args):
 @registerCommand("superusertest", "Check for superuser powers.", "", {"superuserNeeded": True})
 def superuserTest(message, args):
     message.message.reply("Superuser command executed successfully.")
+
+@registerCommand("throwex", "Force an exception.", "", {"superuserNeeded": True})
+def throwex(message, args):
+    if len(args) == 0:
+        msg = "The exception you requested..."
+    else:
+        msg = " ".join(args)
+
+    raise RuntimeError(msg)

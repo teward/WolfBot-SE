@@ -3,6 +3,7 @@ import time
 import HTMLParser
 import getpass
 import random
+import traceback
 
 import WolfUtils
 
@@ -28,7 +29,12 @@ def on_message(message, client):
         cmd = WolfUtils.parseCommand(content)[0]
         args = WolfUtils.parseCommand(content)[1]
         print("Got command " + cmd + " with args " + " ".join(args))
-        COMMANDS.execute(message, cmd, args)
+        try:
+            COMMANDS.execute(message, cmd, args)
+        except Exception:
+            print("Ow! Ran into a problem. Log follows:")
+            traceback.print_exc()
+            message.message.reply("Uh oh! I ran into a problem :(. See the console for more details.")
         #message.message.reply("User " + user.name + " sent command " + command + " with args " + " ".join(args))
 
 print("WolfBot loading... please wait.")

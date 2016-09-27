@@ -1,15 +1,82 @@
+# -*- coding: utf-8 -*-
+
 import WolfUtils
 import feedparser
 import time
 import calendar
+import urllib2
 from datetime import datetime
-from WolfPlugin import registerCommand, registerTask
+from bs4 import BeautifulSoup
 
+from WolfPlugin import registerCommand, registerTask
 from WolfPrefs import PREFS
 
 WORD_LIST = PREFS.get("word_filter_list", [])
 FILTER_URL = PREFS.get("word_filter_source")
 LAST_PULL_TIME = int(time.time())
+
+@registerCommand("s", "Get a shortcutted post", "", {})
+def getshortcut(message, args):
+    if len(args) != 1:
+        message.message.reply("Hey, silly! I need a shortcut to check!")
+        return None
+        
+    currentShortcuts = PREFS.get("post-shortcuts", {})
+        
+    if args[0] not in currentShortcuts:
+        message.message.reply(args[0] + " is not a shortcut. Go away.")
+        return None
+        
+    soup = BeautifulSoup(urllib2.urlopen(currentShortcuts[args[0]]))
+    
+    message.message.reply("Hey! I've got this link for you: [" + soup.title.string + "](" + currentShortcuts[args[0]] +")")
+
+@registerCommand("addshortcut", "Add a new Question Shortcut", "", {"adminNeeded": True})
+def addshortcut(message, args):
+    if len(args) != 2:
+        message.message.reply("Two arguments (name, url) needed!")
+        return None
+        
+    currentShortcuts = PREFS.get("post-shortcuts", {})
+    
+    if args[0] in currentShortcuts:
+        message.message.reply(args[0] + " is already a shortcut! Can't add.")
+        return None
+    
+    currentShortcuts[args[0]] = args[1]
+    PREFS.set("post-shortcuts", currentShortcuts)
+    
+    message.message.reply("From now on, the shortcut `" + args[0] + "` will return [this link](" + args[1] + ").")
+    
+@registerCommand("delshortcut", "Add a new Question Shortcut", "", {"adminNeeded": True})
+def delshortcut(message, args):
+    if len(args) != 1:
+        message.message.reply("Two arguments (name) needed!")
+        return None
+        
+    currentShortcuts = PREFS.get("post-shortcuts", {})
+        
+    if args[0] not in currentShortcuts:
+        message.message.reply(args[0] + " is not a shortcut. Can't remove.")
+        return None
+    
+    del currentShortcuts[args[0]]
+    
+    message.message.reply("From now on, the shortcut `" + args[0] + "` will no longer resolve to anything.")
+    
+@registerCommand("listshortcuts", "List all registered shortcuts", "", {})
+def listshortcuts(message, args):
+    currentShortcuts = PREFS.get("post-shortcuts", None)
+    
+    if currentShortcuts is None:
+        message.message.reply("No shortcuts are present in the system.")
+        return None;
+        
+    qMessage = "I have the following shortcuts in my registry: \n\n"    
+    for s in currentShortcuts:
+        qMessage += "`" + s + "`: " + currentShortcuts[s]
+        
+    message.message.reply(qMessage)
 
 @registerCommand("setfurl", "Set the filter URL", "", {"superuserNeeded": True})
 def addfilter(message, args):
