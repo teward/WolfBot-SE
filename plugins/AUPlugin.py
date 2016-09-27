@@ -204,7 +204,7 @@ def taskRunFilter(room):
         post_timestamps.append(seTimeToUnixTime(entry['published']))
         if seTimeToUnixTime(entry['published']) > LAST_PULL_TIME:
             for word in WORD_BLACKLIST:
-                if word.lower() in entry['summary'].lower() and not any(oword in entry['summary'] for oword in WORD_WHITELIST):
+                if word.lower() in entry['summary'].lower() and not any(oword.lower() in entry['summary'].lower() for oword in WORD_WHITELIST):
                     results.append({"trigger": word, "title": entry['title'], "url": entry['id']})
     
     try:                
