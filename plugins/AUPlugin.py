@@ -92,7 +92,7 @@ def addfilter(message, args):
 @registerCommand("addfilter", "Add something to the Filter list", "", {"adminNeeded": True})
 def addfilter(message, args):
     if len(args) < 2:
-        message.message.reply("Two arguments [bl|wl] (word) needed!")
+        message.message.reply("Two arguments [bl|wl] (words) needed!")
         return None
 
     if args[0] == "bl":
@@ -133,44 +133,58 @@ def addfilter(message, args):
     
 @registerCommand("delfilter", "Remove something from the Filter list", "", {"adminNeeded": True})
 def remfilter(message, args):
-    if len(args) == 0:
-        message.message.reply("One argument (word) needed!")
-        return None    
-    elif len(args) == 1:
-        word = args[0]
-        if word in WORD_BLACKLIST:
-            WORD_BLACKLIST.remove(word)
-            PREFS.set("word_filter_blacklist", WORD_BLACKLIST)
-            message.message.reply("`" + word + "` has been removed from filter list.")
+    if len(args) < 2:
+        message.message.reply("Two arguments [bl|wl] (words) needed!")
+        return None
+
+    if args[0] == "bl":
+        WORD_LIST = WORD_BLACKLIST
+	LIST_NAME = "blacklist"
+    elif args[0] == "wl":
+        WORD_LIST = WORD_WHITELIST
+        LIST_NAME = "whitelist"
+    else:
+        message.message.reply("First argument must be either `bl` (modify blacklist) or `wl` (modify whitelist)!")
+        return None
+
+    if len(args) == 2:
+        word = args[1]
+        if word in WORD_LIST:
+            WORD_LIST.remove(word)
+            PREFS.set("word_filter_" + LIST_NAME, WORD_LIST)
+            message.message.reply("`" + word + "` has been removed from the filter " + LIST_NAME + ".")
         else:
-            message.message.reply("`" + word + "` is not in the filter list!")
+            message.message.reply("`" + word + "` is not in the filter " + LIST_NAME + "!")
         return None
     else:
         merge_fail = []
         
         for word in args:
-            if word in WORD_BLACKLIST:
-                WORD_BLACKLIST.remove(word)
+            if word in WORD_LIST:
+                WORD_LIST.remove(word)
             else:
                 merge_fail.append(word)
-        PREFS.set("word_filter_blacklist", WORD_BLACKLIST)
+        PREFS.set("word_filter_" + LIST_NAME, WORD_BLACKLIST)
         
         if len(merge_fail) == 0:
-            message.message.reply("All words were removed from the list successfully.")
+            message.message.reply("All words were removed from the " + LIST_NAME + "successfully.")
         elif len(merge_fail) == len(args):
-            message.message.reply("No words could be removed from the list (not there?).")
+            message.message.reply("No words could be removed from the " + LIST_NAME + " (not there?).")
         else:
-            message.message.reply(str(len(merge_fail)) + " words could not be removed from the list (not there?):\n" + " ".join(merge_fail))
+            message.message.reply(str(len(merge_fail)) + " words could not be removed from the the " + LIST_NAME + " (not there?):\n" + " ".join(merge_fail))
         
 @registerCommand("clearfilter", "Clear the Filter List", "", {"adminNeeded": True})
 def clearfilter(message, args):
     WORD_BLACKLIST = {}
-    PREFS.set("word_filter_blacklist", WORD_BLACKLIST)
+    WORD_WHITELIST = {}
+    PREFS.set("word_filter_blacklist", {})
+    PREFS.set("word_filter_whitelist", {})
     message.message.reply("The filter list has been cleared.")
     
 @registerCommand("getfilter", "Get all items on the Filter List", "", {})
 def getfilter(message, args):
-    message.message.reply("Words on the filter list:\n" + ", ".join(WORD_BLACKLIST))
+    message.message.reply("Words on the filter blacklist:\n" + ", ".join(WORD_BLACKLIST)) + \
+	"Words on the filter whitelist:\n" + ", ".join(WORD_WHITELIST))
     
     
 @registerTask("GetNewEntries", 60)
