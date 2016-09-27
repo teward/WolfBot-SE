@@ -1,6 +1,8 @@
 import os
 import sys
 import signal
+import json
+import urllib2
 import WolfUtils
 
 import ChatExchange6.chatexchange6 as chatexchange6
@@ -76,7 +78,8 @@ def setprefix(message, args):
 def reload(message, args):
     if len(args) > 1:
         message.message.reply("Zero or one argument (reloadtype (prefs, commands, all)) needed!")
-    
+        return None
+
     if len(args) == 0:
         reloadType = "all"
     else:
@@ -106,6 +109,7 @@ def stop(message = None, args = None):
 def takeRoot(message, args):
     if len(args) != 1:
         message.message.reply("Needs one argument (captain_key)")
+        return None
 
     currentDevs = PREFS.get("devs", [])
     
@@ -125,7 +129,8 @@ def takeRoot(message, args):
 def blacklistUser(message, args):
     if len(args) != 1:
         message.message.reply("Needs one argument (user_id)")
-        
+        return None
+
     user_to_bl = args[0]
     
     current_blacklist = PREFS.get("blacklist", [])
@@ -143,7 +148,8 @@ def blacklistUser(message, args):
 def unblacklistUser(message, args):
     if len(args) != 1:
         message.message.reply("Needs one argument (user_id)")
-        
+        return None
+
     user_to_unbl = args[0]
     
     current_blacklist = PREFS.get("blacklist", [])
@@ -153,9 +159,25 @@ def unblacklistUser(message, args):
         message.message.reply(WolfUtils.getName(user_to_unbl) + " (ID  "+ user_to_unbl + ") is now permitted to use WolfBot commands.")
     else:
         message.message.reply("User is already blacklisted!")
-        
+
+@registerCommand("setroom", "Move the bot to another room", "", {"superuserNeeded": True})
+def setroom(message, args):
+    if len(args) != 1:
+        message.message.reply("Needs one argument (room_id)")
+        return None
+
+    newRoom = str(args[0])
+    PREFS.set("chat_id", args[0])
+
+    newRoomName = json.load(urllib2.urlopen("https://chat.stackexchange.com/rooms/thumbs/" + newRoom))["name"]
+
+    message.message.reply("The bot will reload soon, and will use the new room upon restart. The bot will be moved to [" + newRoomName + "](https://chat.stackexchange.com/rooms/" + newRoom + ").") 
+    sleep(3)
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
 @registerListener("modtool-deletemsg", 18)
 def listenerDeleteMessage(message):
     if message.data["content"] == "@" + SESSION_STORAGE.get("bot_username") + " " + WolfUtils.REPLY_DELIM + "d":
         if WolfUtils.isAdmin(message.data["user_id"]):
             chatexchange6.messages.Message(message.data["parent_id"], message.client).delete()
+

@@ -80,7 +80,8 @@ SESSION_STORAGE.set("bot_id", client._br.user_id)
 # Bind the user to the chat room
 room = client.get_room(__CHATID__)
 room.join()
-room.watch(on_message)
+
+roomWatcher = room.watch(on_message)
 print("WolfBot online.")
 
 while True:
