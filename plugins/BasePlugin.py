@@ -1,6 +1,7 @@
 import os
 import sys
 import signal
+import time
 import json
 import urllib2
 import WolfUtils
@@ -172,7 +173,7 @@ def setroom(message, args):
     newRoomName = json.load(urllib2.urlopen("https://chat.stackexchange.com/rooms/thumbs/" + newRoom))["name"]
 
     message.message.reply("The bot will reload soon, and will use the new room upon restart. The bot will be moved to [" + newRoomName + "](https://chat.stackexchange.com/rooms/" + newRoom + ").") 
-    sleep(3)
+    time.sleep(3)
     os.execl(sys.executable, sys.executable, *sys.argv)
 
 @registerListener("modtool-deletemsg", 18)
