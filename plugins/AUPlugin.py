@@ -183,8 +183,8 @@ def clearfilter(message, args):
     
 @registerCommand("getfilter", "Get all items on the Filter List", "", {})
 def getfilter(message, args):
-    message.message.reply("Words on the filter blacklist:\n" + ", ".join(WORD_BLACKLIST)) + \
-	"Words on the filter whitelist:\n" + ", ".join(WORD_WHITELIST))
+    message.message.reply("Words on the filter blacklist:\n" + ", ".join(WORD_BLACKLIST) + \
+        "\n\nWords on the filter whitelist:\n" + ", ".join(WORD_WHITELIST))
     
     
 @registerTask("GetNewEntries", 60)
