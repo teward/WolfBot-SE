@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 import ChatExchange6.chatexchange6 as chatexchange6
 import time
 import HTMLParser
@@ -28,7 +30,7 @@ def on_message(message, client):
     if WolfUtils.isCommand(content):
         cmd = WolfUtils.parseCommand(content)[0]
         args = WolfUtils.parseCommand(content)[1]
-        print("Got command " + cmd + " with args " + " ".join(args))
+        print("Got command " + cmd + " with args " + str(args))
         try:
             COMMANDS.execute(message, cmd, args)
         except Exception:

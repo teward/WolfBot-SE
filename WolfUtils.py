@@ -31,7 +31,7 @@ def parseCommand(cmd):
         return list(lex)
 
     txt_split = cmd.split()
-    return txt_split[0].replace(CMD_DELIM, "", 1), shlex.split(" ".join(txt_split[1:]))
+    return txt_split[0].replace(CMD_DELIM, "", 1), shlex.split(" ".join(txt_split[1:]).encode('utf-8'))
     
 def webPost(address, data):
     json = requests.post(address,data).json()

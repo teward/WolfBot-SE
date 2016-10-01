@@ -43,6 +43,8 @@ def addshortcut(message, args):
     if args[0] in currentShortcuts:
         message.message.reply(args[0] + " is already a shortcut! Can't add.")
         return None
+
+    args[1] = args[1].decode('ascii', 'ignore')
     
     currentShortcuts[args[0]] = args[1]
     PREFS.set("post-shortcuts", currentShortcuts)
