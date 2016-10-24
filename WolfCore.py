@@ -94,7 +94,7 @@ for room in allRooms:
     # Bind the user to the chat room
     roomObject = client.get_room(room)
     roomObject.join()
-    print("Joined room " + str(room.id))
+    print("Joined room " + str(roomObject.id))
     roomWatcher = roomObject.watch(on_message)
 
     oldRoomlist = SESSION_STORAGE.get("in_rooms", [])

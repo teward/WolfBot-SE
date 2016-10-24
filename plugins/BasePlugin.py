@@ -32,7 +32,7 @@ def addadmin(message, args):
         message.message.reply("User is already a declared admin!")
         return None
 
-
+v
 @registerCommand("deladmin", "Add an Admin to the system.", "", {"superuserNeeded": True})
 def deladmin(message, args):
     room = message.data['room']
@@ -205,14 +205,14 @@ def leaveRoom(message, args):
 
     if mode == "purge":
         PREFS.purgeChat(message.data['room_id'])
-        restart()
+        restart("1", "1")
     elif mode == "ban":
         PREFS.purgeChat(message.data['room_id'])
         PREFS.set(message.data['room_id'], "banned", True)
-        restart()
+        restart("1", "1")
     elif mode == "normal":
         PREFS.set(message.data['room_id'], "active", False)
-        restart()
+        restart("1", "1")
     else:
         message.message.reply("Command expects a mode: normal, purge, ban (No argument implies normal)")
 
