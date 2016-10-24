@@ -12,10 +12,8 @@ import json
 
 from WolfPrefs import PREFS
 
-CMD_DELIM = PREFS.get("command_delimiter")
-REPLY_DELIM = PREFS.get("reply_delimiter")
-
-ROOM_ID = PREFS.get("chat_id")
+CMD_DELIM = PREFS.get("global", "command_delimiter")
+REPLY_DELIM = PREFS.get("global", "reply_delimiter")
 
 # Determine if a text is a command
 #    Arg `message`: The text to check for commandiness
@@ -38,10 +36,11 @@ def webPost(address, data):
     return json
     
 def getName(user_id):
-    return webPost("https://chat.stackexchange.com/user/info", {"ids": user_id, "roomId": ROOM_ID})["users"][0]["name"]
+    # Every user has a record in CSE, and it doesn't matter what room we get it from. So, Room1 is good.
+    return webPost("https://chat.stackexchange.com/user/info", {"ids": user_id, "roomId": "1"})["users"][0]["name"]
     
-def isRoomOwner(user_id):
-    n = webPost("https://chat.stackexchange.com/user/info", {"ids": user_id, "roomId": ROOM_ID})["users"][0]["is_owner"]
+def isRoomOwner(user_id, room_id):
+    n = webPost("https://chat.stackexchange.com/user/info", {"ids": user_id, "roomId": room_id})["users"][0]["is_owner"]
     
     if n is None:
         return False
@@ -49,7 +48,8 @@ def isRoomOwner(user_id):
         return n
 
 def isSEModerator(user_id):
-    n = webPost("https://chat.stackexchange.com/user/info", {"ids": user_id, "roomId": ROOM_ID})["users"][0]["is_moderator"]
+    # SE Mods have SE admin status across the board. So we can query for Room1.
+    n = webPost("https://chat.stackexchange.com/user/info", {"ids": user_id, "roomId": "1"})["users"][0]["is_moderator"]
     
     if n is None:
         return False
@@ -57,17 +57,17 @@ def isSEModerator(user_id):
         return n
     
 def isDeveloper(user_id):
-    if (str(user_id) in PREFS.get("devs", [])):
+    if (str(user_id) in PREFS.get("global", "devs", [])):
         return True
     else:
         return isSEModerator(user_id)
     
-def isAdmin(user_id):
-    if str(user_id) in PREFS.get("admins", []):
+def isAdmin(user_id, room_id):
+    if str(user_id) in PREFS.get(room_id, "admins", []):
         return True
     elif isDeveloper(user_id):
         return True
     else:
-        return isRoomOwner(user_id)
+        return isRoomOwner(room_id, user_id)
         
 

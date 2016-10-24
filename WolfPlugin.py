@@ -19,9 +19,14 @@ class CommandManager:
         # ToDo: Real help!
 
     def execute(self, message, commandName, args):
+        room = str(message.data['room'].id)
 
-        # Make sure the user isn't blacklisted from executing commands  
-        if str(message.data['user_id']) in PREFS.get("blacklist", {}):
+        # Make sure the user isn't blacklisted from executing commands in that room
+        if str(message.data['user_id']) in PREFS.get(room, "user_blacklist", []):
+            return None
+
+        # Make sure the user isn't blacklisted from executing commands globally
+        if str(message.data['user_id']) in PREFS.get("global", "user_blacklist", []):
             return None
             
         # Verify that the command exists.
@@ -29,6 +34,10 @@ class CommandManager:
             command= self._commands[commandName.lower()]
         except KeyError:
             message.message.reply("The command " + WolfUtils.CMD_DELIM + commandName + " does not exist.")
+            return None
+
+        # Make sure the command isn't disabled in the room at hand.
+        if commandName in PREFS.get(room, "disabled_commands", []):
             return None
 
         # Make sure the user is a superuser for superuser commands
@@ -39,9 +48,13 @@ class CommandManager:
 
         # Make sure the user is privileged enough to run this command
         if command["permset"].get("adminNeeded", False):
-            if not WolfUtils.isAdmin(message.data['user_id']):
+            if not WolfUtils.isAdmin(message.data['user_id'], room):
                 message.message.reply("This command needs to be run by a Bot Admin.")
                 return None
+
+        # Make sure the room isn't on admin lockdown
+        if (PREFS.get(room, "lockdown") and (not WolfUtils.isAdmin(message.data['user_id'], room))):
+            return None
 
         command["function"](message, args)
 
@@ -58,14 +71,23 @@ class ScheduledTaskManager:
     def deregister(self, name):
         del self._tasks[name]
         
-    def runTasks(self, room):
-        for task in self._tasks:
-            taskEntry = self._tasks[task]
-            if (int(time.time()) - taskEntry["lastRun"]) >= taskEntry["runDelay"]:
-                #print("Running task " + task)
-                taskEntry["function"](room)
-                taskEntry["lastRun"] = calendar.timegm(time.gmtime())
-                #print("Finished task " + task)
+    def runTasks(self):
+        for room in PREFS.all():
+            if room == "global":
+                continue
+
+            # Skip room if we're in lockdown mode.
+            if PREFS.get(room, "lockdown", False):
+                continue
+
+            for task in self._tasks:
+                if str(task) in PREFS.get(room, "enabled_tasks", []):
+                    taskEntry = self._tasks[task]
+                    if (int(time.time()) - taskEntry["lastRun"]) >= taskEntry["runDelay"]:
+                        # print("Running task " + task)
+                        taskEntry["function"](room)
+                        taskEntry["lastRun"] = calendar.timegm(time.gmtime())
+                        # print("Finished task " + task)
                 
 class ListenerManager:
     def __init__(self):
@@ -79,6 +101,12 @@ class ListenerManager:
         
     def execListeners(self, message):
         eventId = int(message.data['event_type'])
+        room = message.data['room'].id
+
+        # Handle potential lockdown
+        if (PREFS.get(room, "lockdown") and (not WolfUtils.isAdmin(message.data['user_id'], room))):
+            return None
+
         for listenerName in self._listeners:
             listener = self._listeners[listenerName]
             if listener["eventId"] == eventId:

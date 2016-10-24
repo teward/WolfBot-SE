@@ -2,20 +2,23 @@ import WolfUtils
 from WolfPlugin import registerCommand, registerTask
 
 from WolfPrefs import PREFS
+from WolfPrefs import SESSION_STORAGE
+
 
 @registerCommand("start", "Get started with WolfBot!", "", {})
 def start(message, args):
-    message.message.reply("Hi there! Welcome to WolfBot!")
+    message.message.reply("Hi there! Welcome to " + SESSION_STORAGE.get("bot_username") + "!")
     
 @registerCommand("whoami", "Get user information.", "", {})
 def whoami(message, args):
     uid = message.data['user_id']
     username = message.data['user_name']
+    room = message.data['room'].id
     
     isDev = WolfUtils.isDeveloper(uid)
     isMod = WolfUtils.isSEModerator(uid)
-    isAdm = WolfUtils.isAdmin(uid)
-    isRO  = WolfUtils.isRoomOwner(uid)
+    isAdm = WolfUtils.isAdmin(uid, room)
+    isRO  = WolfUtils.isRoomOwner(uid,room)
     
     message.message.reply("You are: " + username + " (ID " + str(uid) + ")" + \
     "\nIs Bot Superuser (Grants Bot Admin): " + str(isDev) + \

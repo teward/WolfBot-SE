@@ -1,6 +1,7 @@
 from shutil import copyfile
 import json
 
+
 class Prefs:
     """
     Object used for storing preferences.
@@ -15,55 +16,49 @@ class Prefs:
     def __getitem__(self, chat):
         return self._prefs.get(str(chat), {})
 
-    def get(self, key, default = None):
+    def get(self, chat, key, default=None):
         """
         Retrieve the value for the provided key in chat. Return None if the
         key or chat does not exist.
         """
         try:
-            return self._prefs[key]
+            return self._prefs[str(chat)][key]
         except KeyError:
             return default
 
-    def exists(self, key):
-        if (self.get(key) is None):
+    def exists(self, chat, key):
+        if (self.get(chat, key) is None):
             return False
 
         return True
 
-    def set(self, key, value):
+    def set(self, chat, key, value):
         """
         Set the value for the provided key in chat, creating objects as needed.
         """
-        c = self._prefs
+        c = self._prefs.get(str(chat), {})
         c[key] = value
-        self._prefs = c
+        self._prefs[str(chat)] = c
         self.save()
-        
-    def delete(self, key):
-        c = self._prefs
+
+    def delete(self, chat, key):
+        c = self._prefs.get(str(chat), {})
         c.pop(key, None)
         self.save()
-        
+
+    def purgeChat(self, chat):
+        self._prefs.pop(str(chat), None)
+        self.save()
+
     def load(self):
         """
         Load preferences from the file.
         """
-        try:
-            with open('config/prefs.json', 'r') as f:
-                try:
-                    self._prefs = json.loads(f.read())
-                except ValueError:
-                    self._prefs = {}
-        except IOError:
-            print("No prefs file found, making default!")
-            self._prefs = {}
-            self.set("command_delimiter", "!!/")
-            print("[Prefs] Set Command String to !!/")
-            self.set("reply_delimiter", "%")
-            print("[Prefs] Set Reply String to %")
-            self.save()
-            print("[Prefs] Default preferences saved.")
+        with open('config/prefs.json', 'r') as f:
+            try:
+                self._prefs = json.loads(f.read())
+            except ValueError:
+                self._prefs = {}
 
     def save(self):
         """
@@ -74,7 +69,7 @@ class Prefs:
 
     def all(self):
         return self._prefs
-        
+
 class SessionStorage:
     """
     Object used for storing preferences.
