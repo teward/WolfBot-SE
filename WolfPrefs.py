@@ -55,10 +55,15 @@ class Prefs:
         Load preferences from the file.
         """
         with open('config/prefs.json', 'r') as f:
-            try:
-                self._prefs = json.loads(f.read())
-            except ValueError:
-                self._prefs = {}
+            if __name__ == '__main__':
+                try:
+                    self._prefs = json.loads(f.read())
+                except ValueError:
+                    self._prefs = {}
+
+                    # Init default prefs
+                    self.set("global", "command_delimiter", "!!/")
+                    self.set("global", "reply_delimiter", "%")
 
     def save(self):
         """
