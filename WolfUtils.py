@@ -12,8 +12,8 @@ import json
 
 from WolfPrefs import PREFS
 
-CMD_DELIM = PREFS.get("global", "command_delimiter")
-REPLY_DELIM = PREFS.get("global", "reply_delimiter")
+CMD_DELIM = PREFS.get("global", "command_delimiter", "!!/")
+REPLY_DELIM = PREFS.get("global", "reply_delimiter", "%")
 
 # Determine if a text is a command
 #    Arg `message`: The text to check for commandiness
