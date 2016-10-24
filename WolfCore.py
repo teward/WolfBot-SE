@@ -98,6 +98,8 @@ for room in allRooms:
     roomWatcher = roomObject.watch(on_message)
 
     oldRoomlist = SESSION_STORAGE.get("in_rooms", [])
+    if not oldRoomList:  # Triggers if it's empty, this is a nasty workaround for the problem
+        oldRoomlist = []
     SESSION_STORAGE.set("in_rooms", oldRoomlist.append(roomObject))
     print("Added " + str(roomObject) + " to session room list.")
 
