@@ -32,7 +32,7 @@ def addadmin(message, args):
         message.message.reply("User is already a declared admin!")
         return None
 
-v
+
 @registerCommand("deladmin", "Add an Admin to the system.", "", {"superuserNeeded": True})
 def deladmin(message, args):
     room = message.data['room']
