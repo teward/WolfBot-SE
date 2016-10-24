@@ -134,7 +134,7 @@ def takeRoot(message, args):
             currentDevs.append(str(message.data['user_id']))
             PREFS.set("global", "devs", currentDevs)
             message.message.reply("https://i.imgur.com/2oNMYD3.jpg")
-            PREFS.delete("captain_key")
+            PREFS.delete("global", "captain_key")
             PREFS.save()
         else:
             message.message.reply("You are by far the worst captain I've ever heard of.")
@@ -194,6 +194,7 @@ def joinRoom(message, args):
 
     PREFS.set(rid, "active", True)
     message.message.reply("The bot has joined the given room.")
+    restart();
 
 @registerCommand("leaveroom", "Have the bot leave the current room.", "", {"superuserNeeded": True})
 def leaveRoom(message, args):
@@ -204,11 +205,14 @@ def leaveRoom(message, args):
 
     if mode == "purge":
         PREFS.purgeChat(message.data['room_id'])
+        restart()
     elif mode == "ban":
         PREFS.purgeChat(message.data['room_id'])
         PREFS.set(message.data['room_id'], "banned", True)
+        restart()
     elif mode == "normal":
         PREFS.set(message.data['room_id'], "active", False)
+        restart()
     else:
         message.message.reply("Command expects a mode: normal, purge, ban (No argument implies normal)")
 

@@ -18,7 +18,7 @@ from WolfPlugin import LISTENERS
 from plugins import *
 
 def on_message(message, client):
-    if not PREFS.get(message.data['room'], "active", False):
+    if not PREFS.get(message.data['room_id'], "active", False):
         return
 
     try:
