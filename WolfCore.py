@@ -43,6 +43,7 @@ def on_message(message, client):
         message.message.reply("Uh oh! I ran into a problem :(. See the console for more details.")
 
 print("WolfBot loading... please wait.")
+PREFS.load()
 
 try:
     input = raw_input
