@@ -13,7 +13,7 @@ def start(message, args):
 def whoami(message, args):
     uid = message.data['user_id']
     username = message.data['user_name']
-    room = message.data['room'].id
+    room = message.data['room_id']
     
     isDev = WolfUtils.isDeveloper(uid)
     isMod = WolfUtils.isSEModerator(uid)

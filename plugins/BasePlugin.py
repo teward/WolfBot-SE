@@ -63,7 +63,7 @@ def setprefix(message, args):
         message.message.reply("Prefix globally reset to default of `!!/`.")
 
         for room in SESSION_STORAGE.get("in_rooms"):
-            if room.id != message.data['room'].id:
+            if room.id != message.data['room_id']:
                 room.send_message("The bot prefix has been set to `!!/` by " + WolfUtils.getName(message.data['user_id']) + ".")
     else:
         PREFS.set("global", "command_delimiter", args[0])
@@ -71,7 +71,7 @@ def setprefix(message, args):
         message.message.reply("Prefix globally set to `" + args[0] + "`.")
 
         for room in SESSION_STORAGE.get("in_rooms"):
-            if room.id != message.data['room'].id:
+            if room.id != message.data['room_id']:
                 room.send_message("The bot prefix has been set to `" + args[0] + "` by " + WolfUtils.getName(message.data['user_id']) + ".")
         
 @registerCommand("setrprefix", "Change the bot reply prefix", "", {"superuserNeeded": True})
@@ -86,7 +86,7 @@ def setprefix(message, args):
         message.message.reply("Prefix reset to default of `%`.")
 
         for room in SESSION_STORAGE.get("in_rooms"):
-            if room.id != message.data['room'].id:
+            if room.id != message.data['room_id']:
                 room.send_message("The reply prefix has been set to `%` by " + WolfUtils.getName(message.data['user_id']) + ".")
     else:
         PREFS.set("global", "reply_delimiter", args[0])
@@ -94,7 +94,7 @@ def setprefix(message, args):
         message.message.reply("Prefix set to `" + args[0] + "`.")
 
         for room in SESSION_STORAGE.get("in_rooms"):
-            if room.id != message.data['room'].id:
+            if room.id != message.data['room_id']:
                 room.send_message("The reply prefix has been set to `" + args[0] + "` by " + WolfUtils.getName(message.data['user_id']) + ".")
         
 @registerCommand("reload", "Reload the bot", "<prefs>", {"superuserNeeded": True})
@@ -203,18 +203,18 @@ def leaveRoom(message, args):
         mode = args(0)
 
     if mode == "purge":
-        PREFS.purgeChat(message.data['room'].id)
+        PREFS.purgeChat(message.data['room_id'])
     elif mode == "ban":
-        PREFS.purgeChat(message.data['room'].id)
-        PREFS.set(message.data['room'].id, "banned", True)
+        PREFS.purgeChat(message.data['room_id'])
+        PREFS.set(message.data['room_id'], "banned", True)
     elif mode == "normal":
-        PREFS.set(message.data['room'].id, "active", False)
+        PREFS.set(message.data['room_id'], "active", False)
     else:
         message.message.reply("Command expects a mode: normal, purge, ban (No argument implies normal)")
 
 @registerCommand("lockdown", "Lock down the bot and prevent it from taking actions from non-admins", "", {"adminNeeded": True})
 def lockdown(message, args):
-    room = message.data['room'].id
+    room = message.data['room_id']
 
     lockdownState = PREFS.get(room, "lockdown", False)
 
@@ -242,7 +242,7 @@ def lockdown(message, args):
 
 @registerCommand("addtask", "Add a task to the list of tasks executable by the bot.", "", {"adminNeeded": True})
 def addtask (message, args):
-    currentTasks = PREFS.get(message.data['room'].id, "enabled_tasks", [])
+    currentTasks = PREFS.get(message.data['room_id'], "enabled_tasks", [])
 
     if (len(args) == 0):
         message.message.reply("Expected one argument: task_name")
@@ -256,7 +256,7 @@ def addtask (message, args):
 
 @registerCommand("deltask", "Remove a task from the list of tasks executable by the bot.", "", {"adminNeeded": True})
 def addtask (message, args):
-    currentTasks = PREFS.get(message.data['room'].id, "enabled_tasks", [])
+    currentTasks = PREFS.get(message.data['room_id'], "enabled_tasks", [])
 
     if (len(args) == 0):
         message.message.reply("Expected one argument: task_name")
@@ -271,6 +271,6 @@ def addtask (message, args):
 @registerListener("modtool-deletemsg", 18)
 def listenerDeleteMessage(message):
     if message.data["content"] == "@" + SESSION_STORAGE.get("bot_username") + " " + WolfUtils.REPLY_DELIM + "d":
-        if WolfUtils.isAdmin(message.data["user_id"], message.data['room'].id):
+        if WolfUtils.isAdmin(message.data["user_id"], message.data['room_id']):
             chatexchange6.messages.Message(message.data["parent_id"], message.client).delete()
 

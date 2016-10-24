@@ -39,7 +39,7 @@ def addshortcut(message, args):
         message.message.reply("Two arguments (name, url) needed!")
         return None
         
-    currentShortcuts = PREFS.get(message.data['room'].id, "post-shortcuts", {})
+    currentShortcuts = PREFS.get(message.data['room_id'], "post-shortcuts", {})
     
     if args[0] in currentShortcuts:
         message.message.reply(args[0] + " is already a shortcut! Can't add.")
@@ -48,7 +48,7 @@ def addshortcut(message, args):
     args[1] = args[1].decode('ascii', 'ignore')
     
     currentShortcuts[args[0]] = args[1]
-    PREFS.set(message.data['room'].id, "post-shortcuts", currentShortcuts)
+    PREFS.set(message.data['room_id'], "post-shortcuts", currentShortcuts)
     
     message.message.reply("From now on, the shortcut `" + args[0] + "` will return [this link](" + args[1] + ").")
     
@@ -58,7 +58,7 @@ def delshortcut(message, args):
         message.message.reply("Two arguments (name) needed!")
         return None
         
-    currentShortcuts = PREFS.get(message.data['room'].id, "post-shortcuts", {})
+    currentShortcuts = PREFS.get(message.data['room_id'], "post-shortcuts", {})
         
     if args[0] not in currentShortcuts:
         message.message.reply(args[0] + " is not a shortcut. Can't remove.")
@@ -70,7 +70,7 @@ def delshortcut(message, args):
     
 @registerCommand("listshortcuts", "List all registered shortcuts", "", {})
 def listshortcuts(message, args):
-    currentShortcuts = PREFS.get(message.data['room'].id, "post-shortcuts", None)
+    currentShortcuts = PREFS.get(message.data['room_id'], "post-shortcuts", None)
     
     if currentShortcuts is None:
         message.message.reply("No shortcuts are present in the system.")
@@ -89,7 +89,7 @@ def addfilter(message, args):
         return None
         
     FILTER_URL = args[0]
-    PREFS.set(message.data['room'].id, "word_filter_source", FILTER_URL)
+    PREFS.set(message.data['room_id'], "word_filter_source", FILTER_URL)
     message.message.reply("Filter Source URL set to " + args[0])
 
 @registerCommand("addfilter", "Add something to the Filter list", "", {"adminNeeded": True})
@@ -99,10 +99,10 @@ def addfilter(message, args):
         return None
 
     if args[0] == "bl":
-        WORD_LIST = PREFS.get(message.data['room'].id, "word_filter_blacklist", [])
+        WORD_LIST = PREFS.get(message.data['room_id'], "word_filter_blacklist", [])
         LIST_NAME = "blacklist"
     elif args[0] == "wl":
-        WORD_LIST = PREFS.get(message.data['room'].id, "word_filter_whitelist", [])
+        WORD_LIST = PREFS.get(message.data['room_id'], "word_filter_whitelist", [])
         LIST_NAME = "whitelist"
     else:
         message.message.reply("First argument must be either bl or wl!")
@@ -112,7 +112,7 @@ def addfilter(message, args):
         word = args[1]
         if word not in WORD_LIST:
             WORD_LIST.append(word)
-            PREFS.set(message.data['room'].id, "word_filter_" + LIST_NAME, WORD_LIST)
+            PREFS.set(message.data['room_id'], "word_filter_" + LIST_NAME, WORD_LIST)
             message.message.reply("`" + word + "` has been added to the filter " + LIST_NAME  + ".")
         else:
             message.message.reply("`" + word + "` is already in the filter" + LIST_NAME + "!")
@@ -125,7 +125,7 @@ def addfilter(message, args):
                 WORD_LIST.append(word)
             else:
                 merge_fail.append(word)
-        PREFS.set(message.data['room'].id, "word_filter_" + LIST_NAME, WORD_LIST)
+        PREFS.set(message.data['room_id'], "word_filter_" + LIST_NAME, WORD_LIST)
         
         if len(merge_fail) == 0:
             message.message.reply("All words were added to " + LIST_NAME + " successfully.")
@@ -141,10 +141,10 @@ def remfilter(message, args):
         return None
 
     if args[0] == "bl":
-        WORD_LIST = PREFS.get(message.data['room'].id, "word_filter_blacklist", [])
+        WORD_LIST = PREFS.get(message.data['room_id'], "word_filter_blacklist", [])
         LIST_NAME = "blacklist"
     elif args[0] == "wl":
-        WORD_LIST = PREFS.get(message.data['room'].id, "word_filter_whitelist", [])
+        WORD_LIST = PREFS.get(message.data['room_id'], "word_filter_whitelist", [])
         LIST_NAME = "whitelist"
     else:
         message.message.reply("First argument must be either `bl` (modify blacklist) or `wl` (modify whitelist)!")
@@ -154,7 +154,7 @@ def remfilter(message, args):
         word = args[1]
         if word in WORD_LIST:
             WORD_LIST.remove(word)
-            PREFS.set(message.data['room'].id, "word_filter_" + LIST_NAME, WORD_LIST)
+            PREFS.set(message.data['room_id'], "word_filter_" + LIST_NAME, WORD_LIST)
             message.message.reply("`" + word + "` has been removed from the filter " + LIST_NAME + ".")
         else:
             message.message.reply("`" + word + "` is not in the filter " + LIST_NAME + "!")
@@ -167,7 +167,7 @@ def remfilter(message, args):
                 WORD_LIST.remove(word)
             else:
                 merge_fail.append(word)
-        PREFS.set(message.data['room'].id, "word_filter_" + LIST_NAME, WORD_LIST)
+        PREFS.set(message.data['room_id'], "word_filter_" + LIST_NAME, WORD_LIST)
         
         if len(merge_fail) == 0:
             message.message.reply("All words were removed from the " + LIST_NAME + "successfully.")
@@ -178,14 +178,14 @@ def remfilter(message, args):
         
 @registerCommand("clearfilter", "Clear the Filter List", "", {"adminNeeded": True})
 def clearfilter(message, args):
-    PREFS.set(message.data['room'].id, "word_filter_blacklist", [])
-    PREFS.set(message.data['room'].id, "word_filter_whitelist", [])
+    PREFS.set(message.data['room_id'], "word_filter_blacklist", [])
+    PREFS.set(message.data['room_id'], "word_filter_whitelist", [])
     message.message.reply("The filter list has been cleared.")
     
 @registerCommand("getfilter", "Get all items on the Filter List", "", {})
 def getfilter(message, args):
-    message.message.reply("Words on the filter blacklist:\n" + ", ".join(PREFS.get(message.data['room'].id, "word_filter_blacklist", [])) + \
-        "\n\nWords on the filter whitelist:\n" + ", ".join(PREFS.get(message.data['room'].id, "word_filter_whitelist", [])))
+    message.message.reply("Words on the filter blacklist:\n" + ", ".join(PREFS.get(message.data['room_id'], "word_filter_blacklist", [])) + \
+        "\n\nWords on the filter whitelist:\n" + ", ".join(PREFS.get(message.data['room_id'], "word_filter_whitelist", [])))
     
     
 @registerTask("GetNewEntries", 60)

@@ -19,7 +19,7 @@ class CommandManager:
         # ToDo: Real help!
 
     def execute(self, message, commandName, args):
-        room = str(message.data['room'].id)
+        room = str(message.data['room_id'])
 
         # Make sure the user isn't blacklisted from executing commands in that room
         if str(message.data['user_id']) in PREFS.get(room, "user_blacklist", []):
@@ -101,7 +101,7 @@ class ListenerManager:
         
     def execListeners(self, message):
         eventId = int(message.data['event_type'])
-        room = message.data['room'].id
+        room = message.data['room_id']
 
         # Handle potential lockdown
         if (PREFS.get(room, "lockdown") and (not WolfUtils.isAdmin(message.data['user_id'], room))):
