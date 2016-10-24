@@ -87,7 +87,7 @@ class SessionStorage:
     def __getitem__(self, chat):
         return self._prefs.get(str(chat), {})
 
-    def get(self, key, default = None):
+    def get(self, key, default=None):
         """
         Retrieve the value for the provided key in chat. Return None if the
         key or chat does not exist.

@@ -92,11 +92,14 @@ for room in allRooms:
         continue
 
     # Bind the user to the chat room
-    room = client.get_room(room)
-    room.join()
+    roomObject = client.get_room(room)
+    roomObject.join()
     print("Joined room " + str(room.id))
-    roomWatcher = room.watch(on_message)
-    SESSION_STORAGE.set("in_rooms", SESSION_STORAGE.get("in_rooms", []).append(room))
+    roomWatcher = roomObject.watch(on_message)
+
+    oldRoomlist = SESSION_STORAGE.get("in_rooms", [])
+    SESSION_STORAGE.set("in_rooms", oldRoomlist.append(roomObject))
+    print("Added " + str(roomObject) + " to session room list.")
 
 print("WolfBot (named " + SESSION_STORAGE.get("bot_username") + ") online.")
 

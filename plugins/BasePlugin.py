@@ -194,7 +194,7 @@ def joinRoom(message, args):
 
     PREFS.set(rid, "active", True)
     message.message.reply("The bot has joined the given room.")
-    restart();
+    restart("1", "1");
 
 @registerCommand("leaveroom", "Have the bot leave the current room.", "", {"superuserNeeded": True})
 def leaveRoom(message, args):
@@ -245,7 +245,7 @@ def lockdown(message, args):
         message.message.reply("Room no longer under lockdown. Commands may be freely given, and tasks will run once again.")
 
 @registerCommand("addtask", "Add a task to the list of tasks executable by the bot.", "", {"adminNeeded": True})
-def addtask (message, args):
+def deltask(message, args):
     currentTasks = PREFS.get(message.data['room_id'], "enabled_tasks", [])
 
     if (len(args) == 0):
@@ -259,7 +259,7 @@ def addtask (message, args):
         message.message.reply("The task `" + args(0) + "` is now enabled for this room. Note that it may still need configuration.")
 
 @registerCommand("deltask", "Remove a task from the list of tasks executable by the bot.", "", {"adminNeeded": True})
-def addtask (message, args):
+def deltask(message, args):
     currentTasks = PREFS.get(message.data['room_id'], "enabled_tasks", [])
 
     if (len(args) == 0):
