@@ -98,8 +98,7 @@ for room in allRooms:
     roomWatcher = roomObject.watch(on_message)
 
     oldRoomlist = SESSION_STORAGE.get("in_rooms", [])
-    SESSION_STORAGE.set("in_rooms", oldRoomlist.append(roomObject))
-    print("Added " + str(roomObject) + " to session room list.")
+    oldRoomlist.append(roomObject)
 
 print("WolfBot (named " + SESSION_STORAGE.get("bot_username") + ") online.")
 
