@@ -85,7 +85,7 @@ for room in allRooms:
     if room == "global":
         continue
 
-    if PREFS.get(room, "active", True):
+    if PREFS.get(room, "active", True) and not PREFS.get(room, "banned", False):
         PREFS.set(room, "active", True)
         print("Updated room ID " + str(room) + " to new prefs format. It is now Active.")
     else:

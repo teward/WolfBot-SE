@@ -201,7 +201,7 @@ def leaveRoom(message, args):
     if len(args) == 0:
         mode = "normal"
     else:
-        mode = args(0)
+        mode = args[0]
 
     if mode == "purge":
         PREFS.purgeChat(message.data['room_id'])
