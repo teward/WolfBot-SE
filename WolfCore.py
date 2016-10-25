@@ -99,6 +99,7 @@ for room in allRooms:
 
     oldRoomlist = SESSION_STORAGE.get("in_rooms", [])
     oldRoomlist.append(roomObject)
+    SESSION_STORAGE.set("in_rooms", oldRoomlist)
 
 print("WolfBot (named " + SESSION_STORAGE.get("bot_username") + ") online.")
 
