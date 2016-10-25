@@ -4,21 +4,24 @@ import calendar
 from WolfPrefs import PREFS
 import WolfUtils
 
+
 class CommandManager:
     def __init__(self):
         self._commands = {}
 
-    def register(self, function, commandName, helptext, helpargs, permset):
-        self._commands[commandName] = {"function": function, "helptext": helptext, "helpargs": helpargs, "permset": permset}
+    def register(self, function, command_name, helptext, helpargs, permset):
+        self._commands[command_name] = {"function": function, "helptext": helptext,
+                                        "helpargs": helpargs, "permset": permset}
 
-    def deregister(self, commandName):
-        del self._commands[commandName]
+    def deregister(self, command_name):
+        del self._commands[command_name]
 
-    def gethelp(self):
+    @staticmethod
+    def gethelp():
         return None
         # ToDo: Real help!
 
-    def execute(self, message, commandName, args):
+    def execute(self, message, command_name, args):
         room = str(message.data['room_id'])
 
         # Make sure the user isn't blacklisted from executing commands in that room
@@ -28,50 +31,53 @@ class CommandManager:
         # Make sure the user isn't blacklisted from executing commands globally
         if str(message.data['user_id']) in PREFS.get("global", "user_blacklist", []):
             return None
-            
+
         # Verify that the command exists.
         try:
-            command= self._commands[commandName.lower()]
+            command = self._commands[command_name.lower()]
         except KeyError:
-            message.message.reply("The command " + WolfUtils.CMD_DELIM + commandName + " does not exist.")
+            message.message.reply(
+                "The command " + WolfUtils.CMD_DELIM + command_name + " does not exist.")
             return None
 
         # Make sure the command isn't disabled in the room at hand.
-        if commandName in PREFS.get(room, "disabled_commands", []):
+        if command_name in PREFS.get(room, "disabled_commands", []):
             return None
 
         # Make sure the user is a superuser for superuser commands
         if command["permset"].get("superuserNeeded", False):
-            if not WolfUtils.isDeveloper(message.data['user_id']):
+            if not WolfUtils.is_developer(message.data['user_id']):
                 message.message.reply("This command needs to be run by a Superuser.")
                 return None
 
         # Make sure the user is privileged enough to run this command
         if command["permset"].get("adminNeeded", False):
-            if not WolfUtils.isAdmin(message.data['user_id'], room):
+            if not WolfUtils.is_admin(message.data['user_id'], room):
                 message.message.reply("This command needs to be run by a Bot Admin.")
                 return None
 
         # Make sure the room isn't on admin lockdown
-        if (PREFS.get(room, "lockdown") and (not WolfUtils.isAdmin(message.data['user_id'], room))):
+        if PREFS.get(room, "lockdown") and \
+                (not WolfUtils.is_admin(message.data['user_id'], room)):
             return None
 
         command["function"](message, args)
 
     def all(self):
         return self._commands
-        
+
+
 class ScheduledTaskManager:
     def __init__(self):
         self._tasks = {}
-    
-    def register(self, function, name, runDelay):
-        self._tasks[name] = {"function": function, "runDelay": runDelay, "lastRun": 0}
-        
+
+    def register(self, function, name, run_delay):
+        self._tasks[name] = {"function": function, "run_delay": run_delay, "lastRun": 0}
+
     def deregister(self, name):
         del self._tasks[name]
-        
-    def runTasks(self):
+
+    def run_tasks(self):
         for room in PREFS.all():
             if room == "global":
                 continue
@@ -82,64 +88,72 @@ class ScheduledTaskManager:
 
             for task in self._tasks:
                 if str(task) in PREFS.get(room, "enabled_tasks", []):
-                    taskEntry = self._tasks[task]
-                    if (int(time.time()) - taskEntry["lastRun"]) >= taskEntry["runDelay"]:
+                    task_entry = self._tasks[task]
+                    if (int(time.time()) - task_entry["lastRun"]) >= task_entry["runDelay"]:
                         # print("Running task " + task)
-                        taskEntry["function"](room)
-                        taskEntry["lastRun"] = calendar.timegm(time.gmtime())
+                        task_entry["function"](room)
+                        task_entry["lastRun"] = calendar.timegm(time.gmtime())
                         # print("Finished task " + task)
-                
+
+
 class ListenerManager:
     def __init__(self):
         self._listeners = {}
-    
-    def register(self, function, name, eventId):
-        self._listeners[name] = {"function": function, "eventId": eventId}
-        
+
+    def register(self, function, name, event_id):
+        self._listeners[name] = {"function": function, "event_id": event_id}
+
     def deregister(self, name):
         del self._listeners[name]
-        
-    def execListeners(self, message):
-        eventId = int(message.data['event_type'])
+
+    def exec_listeners(self, message):
+        event_id = int(message.data['event_type'])
         room = message.data['room_id']
 
         # Handle potential lockdown
-        if (PREFS.get(room, "lockdown") and (not WolfUtils.isAdmin(message.data['user_id'], room))):
+        if PREFS.get(room, "lockdown") and (not WolfUtils.is_admin(message.data['user_id'], room)):
             return None
 
         for listenerName in self._listeners:
             listener = self._listeners[listenerName]
-            if listener["eventId"] == eventId:
+            if listener["eventId"] == event_id:
                 listener["function"](message)
-                
-        
+
+
 COMMANDS = CommandManager()
 TASKS = ScheduledTaskManager()
 LISTENERS = ListenerManager()
 
-def registerCommand(name, helptext, helpargs, permset):
+
+def register_command(name, helptext, helpargs, permset):
     def wrap(fn):
         # perform registration here
         # fn points to the function itself
         # fn.__name__ is the name of the function
         COMMANDS.register(fn, name, helptext, helpargs, permset)
-        #print "Registered command " + WolfUtils.CMD_DELIM + name
+        # print "Registered command " + WolfUtils.CMD_DELIM + name
+
     return wrap
-    
-def registerTask(name, runDelay):
+
+
+def register_task(name, run_delay):
     def wrap(fn):
         # perform registration here
         # fn points to the function itself
         # fn.__name__ is the name of the function
-        TASKS.register(fn, name, runDelay)
-        #print "Registered scheduled task " + name + ", to be run every " + str(runDelay) + " seconds."
+        TASKS.register(fn, name, run_delay)
+        # print "Registered scheduled task " + name + ",
+        # to be run every " + str(run_delay) + " seconds."
+
     return wrap
-    
-def registerListener(name, eventId):
+
+
+def register_listener(name, event_id):
     def wrap(fn):
         # perform registration here
         # fn points to the function itself
         # fn.__name__ is the name of the function
-        LISTENERS.register(fn, name, eventId)
-        #print "Registered listener " + name
+        LISTENERS.register(fn, name, event_id)
+        # print "Registered listener " + name
+
     return wrap

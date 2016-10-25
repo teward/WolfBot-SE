@@ -1,3 +1,4 @@
+# noinspection PyUnresolvedReferences
 from shutil import copyfile
 import json
 
@@ -27,7 +28,7 @@ class Prefs:
             return default
 
     def exists(self, chat, key):
-        if (self.get(chat, key) is None):
+        if self.get(chat, key) is None:
             return False
 
         return True
@@ -46,7 +47,7 @@ class Prefs:
         c.pop(key, None)
         self.save()
 
-    def purgeChat(self, chat):
+    def purge_chat(self, chat):
         self._prefs.pop(str(chat), None)
         self.save()
 
@@ -79,6 +80,7 @@ class Prefs:
     def all(self):
         return self._prefs
 
+
 class SessionStorage:
     """
     Object used for storing preferences.
@@ -104,7 +106,7 @@ class SessionStorage:
             return default
 
     def exists(self, key):
-        if (self.get(key) is None):
+        if self.get(key) is None:
             return False
 
         return True

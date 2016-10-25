@@ -15,14 +15,18 @@ from WolfPlugin import COMMANDS
 from WolfPlugin import TASKS
 from WolfPlugin import LISTENERS
 
+# noinspection PyUnresolvedReferences
 from plugins import *
 
+
+# noinspection PyUnusedLocal,PyShadowingNames
 def on_message(message, client):
     if not PREFS.get(message.data['room_id'], "active", False):
         return
 
+    # noinspection PyBroadException
     try:
-        LISTENERS.execListeners(message)
+        LISTENERS.exec_listeners(message)
 
         if not isinstance(message, chatexchange6.events.MessagePosted):
             return
@@ -30,21 +34,24 @@ def on_message(message, client):
         content = HTMLParser.HTMLParser().unescape(message.content)
         user = message.user
 
-        if WolfUtils.isCommand(content):
-            cmd = WolfUtils.parseCommand(content)[0]
-            args = WolfUtils.parseCommand(content)[1]
+        if WolfUtils.is_command(content):
+            cmd = WolfUtils.parse_command(content)[0]
+            args = WolfUtils.parse_command(content)[1]
             print("Got command " + cmd + " with args " + str(args))
             COMMANDS.execute(message, cmd, args)
-            #message.message.reply("User " + user.name + " sent command " + command + " with args " + " ".join(args))
+            # message.message.reply("User " + user.name + " sent command " + command +
+            #  " with args " + " ".join(args))
 
     except Exception:
         print("Ow! Ran into a problem. Log follows:")
         traceback.print_exc()
         message.message.reply("Uh oh! I ran into a problem :(. See the console for more details.")
 
+
 print("WolfBot loading... please wait.")
 
 try:
+    # noinspection PyShadowingBuiltins
     input = raw_input
 except NameError:
     pass
@@ -54,17 +61,18 @@ __USER__ = PREFS.get("global", "username", None)
 __PASS__ = PREFS.get("global", "password", None)
 
 if __USER__ is None:
+    # noinspection PyUnboundLocalVariable
     __USER__ = input("Please enter the e-mail to use: ")
     PREFS.set("global", "username", __USER__)
     __PASS__ = getpass.getpass("Please enter the password to use: ")
     PREFS.set("global", "password", __PASS__)
     PREFS.save()
 
-if PREFS.get("global", "devs", []) == []:
+if not PREFS.get("global", "devs", []):
     ckey = "%06x" % random.randint(0, 0xFFFFFF)
     PREFS.set("global", "captain_key", ckey)
-    print("Please run this command to gain superuser privileges (single-use!):\n\n " + WolfUtils.CMD_DELIM + "iamthecaptainnow " + ckey.upper() + "\n\n")
-    
+    print("Please run this command to gain superuser privileges (single-use!):\n\n "
+          + WolfUtils.CMD_DELIM + "iamthecaptainnow " + ckey.upper() + "\n\n")
 
 # Register the Client to be used
 client = chatexchange6.Client('stackexchange.com')
@@ -74,6 +82,7 @@ client.login(__USER__, __PASS__)
 me = client.get_me()
 
 SESSION_STORAGE.set("bot_username", me.name.replace(" ", ""))
+# noinspection PyProtectedMember
 SESSION_STORAGE.set("bot_id", client._br.user_id)
 
 allRooms = PREFS.all()
@@ -105,7 +114,7 @@ print("WolfBot (named " + SESSION_STORAGE.get("bot_username") + ") online.")
 
 while True:
     time.sleep(1)
-    TASKS.runTasks()
+    TASKS.run_tasks()
 
 PREFS.save()
 client.logout()
