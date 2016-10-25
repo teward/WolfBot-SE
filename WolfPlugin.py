@@ -116,7 +116,7 @@ class ListenerManager:
 
         for listenerName in self._listeners:
             listener = self._listeners[listenerName]
-            if listener["eventId"] == event_id:
+            if listener["event_id"] == event_id:
                 listener["function"](message)
 
 
